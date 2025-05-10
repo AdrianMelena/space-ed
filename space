@@ -1,11 +1,12 @@
 create table celestial_objects (
-   id 		      SERIAL PRIMARY KEY,
-   object_type   VARCHAR(30),
-   name 		  VARCHAR(30),
-   constellation VARCHAR(30),
-   beauty	      boolean
+   id 		        SERIAL PRIMARY KEY,
+   object_type      VARCHAR(30),
+   object_name 		VARCHAR(30),
+   constellation    VARCHAR(30),
+   beauty	        boolean
 );
-insert into celestial_objects (object_type, name, constellation, beauty)
+
+insert into celestial_objects (object_type, object_name, constellation, beauty)
 values
 ('binary system', 'Sirius', 'Canis Major', 'YES'),
 ('white dwarf', 'Sirius A', 'Canis Major', 'YES'),
@@ -68,7 +69,7 @@ values
 ('minor planet/asteroid', 'Vesta', null, 'no'),
 ('minor planet/asteroid', 'Pallas', null, 'NO'),
 ('asteroid', 'Psyche', null, 'NO'),
-('solar system',' The Solar System', null, 'YES'),
+('solar system','The Solar System', null, 'YES'),
 ('star', 'Sun', null, 'YES'),
 ('planet', 'Mercury', null, 'YES'),
 ('planet', 'Venus', null, 'YES'),
@@ -91,7 +92,51 @@ values
 ('galaxy', 'M87', 'Virgo', 'YES')
 ;
 
-SELECT *
-FROM celestial_objects
-where object_type like 'star' and constellation like 'Taurus';
+drop table celestial_objects;
 
+SELECT * from celestial_objects;
+
+SELECT COUNT(DISTINCT constellation) AS unique_constellations 
+FROM celestial_objects;
+
+SELECT MIN(object_name) AS first_alphabetically,
+       MAX(object_name) AS last_alphabetically
+FROM celestial_objects;
+
+SELECT UPPER(object_name) AS upper_name, 
+       LOWER(constellation) AS lower_const
+FROM celestial_objects
+LIMIT 5;
+
+SELECT object_name, LENGTH(object_name) AS name_length
+FROM celestial_objects
+ORDER BY name_length DESC
+LIMIT 5;
+
+SELECT object_name, SUBSTRING(object_name, 1, 3) AS name_prefix
+FROM celestial_objects
+LIMIT 5;
+
+SELECT CONCAT(object_name, ' in ', constellation) AS location
+FROM celestial_objects
+WHERE constellation IS NOT NULL
+LIMIT 5;
+
+SELECT object_name, 
+       CASE 
+           WHEN beauty = 'YES' THEN 'Beautiful'
+           WHEN beauty = 'NO' THEN 'Not Beautiful'
+           ELSE 'Unknown Beauty'
+       END AS beauty_description
+FROM celestial_objects
+LIMIT 20;
+
+SELECT object_name, COALESCE(constellation, 'No Constellation') AS const
+FROM celestial_objects
+WHERE constellation IS NULL
+LIMIT 5;
+
+SELECT c1.object_name AS parent_object, c2.object_name AS child_object
+FROM celestial_objects c1
+INNER JOIN celestial_objects c2 ON c2.object_name LIKE CONCAT(c1.object_name, ' %')
+WHERE c1.object_type IN ('binary system', 'stellar system', 'star system');
